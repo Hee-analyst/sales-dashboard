@@ -1,0 +1,29 @@
+# 가상환경
+venv/
+env/
+ENV/
+
+# Python 캐시
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Streamlit 캐시
+.streamlit/
+
+# 데이터 파일 (선택사항: 데이터를 포함하려면 이 줄 제거)
+# sales_data.csv
+
+# macOS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 기타
+*.log
