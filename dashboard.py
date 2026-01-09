@@ -2,7 +2,9 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-from datetime import datetime
+from datetime import datetime, timedelta
+import numpy as np
+import os
 
 # 페이지 설정
 st.set_page_config(
@@ -11,19 +13,52 @@ st.set_page_config(
     layout="wide"
 )
 
+# 데이터 생성 함수
+def generate_sales_data():
+    """가상 판매 데이터 생성"""
+    np.random.seed(42)
+
+    # 날짜 범위 (최근 3개월)
+    start_date = datetime.now() - timedelta(days=90)
+    dates = [start_date + timedelta(days=i) for i in range(90)]
+
+    # 제품 카테고리
+    categories = ['전자제품', '의류', '식품', '가구', '도서']
+
+    # 데이터 생성
+    data = []
+    for date in dates:
+        for category in categories:
+            sales = np.random.randint(50, 500)
+            quantity = np.random.randint(5, 50)
+            data.append({
+                '날짜': date.strftime('%Y-%m-%d'),
+                '카테고리': category,
+                '판매액': sales,
+                '판매수량': quantity
+            })
+
+    # DataFrame 생성 및 저장
+    df = pd.DataFrame(data)
+    df.to_csv('sales_data.csv', index=False, encoding='utf-8-sig')
+    return df
+
 # 데이터 로드
 @st.cache_data
 def load_data():
-    df = pd.read_csv('sales_data.csv')
+    # 데이터 파일이 없으면 자동 생성
+    if not os.path.exists('sales_data.csv'):
+        st.info("데이터 파일이 없어 가상 데이터를 생성합니다...")
+        df = generate_sales_data()
+        st.success("데이터 생성 완료!")
+    else:
+        df = pd.read_csv('sales_data.csv')
+
     df['날짜'] = pd.to_datetime(df['날짜'])
     return df
 
 # 데이터 로드
-try:
-    df = load_data()
-except FileNotFoundError:
-    st.error("sales_data.csv 파일을 찾을 수 없습니다. generate_data.py를 먼저 실행해주세요.")
-    st.stop()
+df = load_data()
 
 # 제목
 st.title("📊 판매 데이터 분석 대시보드")
